@@ -138,20 +138,4 @@ public class LatLngSpan implements Parcelable {
     result = 31 * result + (int) (temp ^ (temp >>> 32));
     return result;
   }
-
-  /**
-   * Get the absolute distance, in degrees, between the west and
-   * east boundaries of this LatLngBounds
-   *
-   * @return Span distance
-   */
-  static double getLongitudeSpan(double east, double west) {
-    double longSpan = Math.abs(east - west);
-    if (east > west) {
-      return longSpan;
-    }
-
-    // shortest span contains antimeridian
-    return GeometryConstants.LONGITUDE_SPAN - longSpan;
-  }
 }

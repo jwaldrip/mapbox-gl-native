@@ -94,7 +94,7 @@ public class LatLngBoundsTest {
 
   @Test
   public void dateLineSpanFrom1() {
-    latLngBounds = LatLngBounds.from(10, -170, -10, 170);
+    latLngBounds = LatLngBounds.from(10, -170, -10, -190);
     LatLngSpan latLngSpan = latLngBounds.getSpan();
     assertEquals("LatLngSpan should be shortest distance", new LatLngSpan(20, 20),
       latLngSpan);
@@ -118,28 +118,28 @@ public class LatLngBoundsTest {
 
   @Test
   public void nearDateLineCenter1() {
-    latLngBounds = LatLngBounds.from(10, -175, -10, 165);
+    latLngBounds = LatLngBounds.from(10, -175, -10, -195);
     LatLng center = latLngBounds.getCenter();
-    assertEquals("Center should match", new LatLng(0, 175), center);
+    assertEquals("Center should match", new LatLng(0, -185), center);
   }
 
   @Test
   public void nearDateLineCenter2() {
-    latLngBounds = LatLngBounds.from(10, -165, -10, 175);
+    latLngBounds = LatLngBounds.from(10, 195, -10, 175);
     LatLng center = latLngBounds.getCenter();
-    assertEquals("Center should match", new LatLng(0, -175), center);
+    assertEquals("Center should match", new LatLng(0, 185), center);
   }
 
   @Test
   public void nearDateLineCenter3() {
-    latLngBounds = LatLngBounds.from(10, -170, -10, 170);
+    latLngBounds = LatLngBounds.from(10, -170, -10, -190);
     LatLng center = latLngBounds.getCenter();
     assertEquals("Center should match", new LatLng(0, -180), center);
   }
 
   @Test
   public void nearDateLineCenter4() {
-    latLngBounds = LatLngBounds.from(10, -180, -10, 0);
+    latLngBounds = LatLngBounds.from(10, 180, -10, 0);
     LatLng center = latLngBounds.getCenter();
     assertEquals("Center should match", new LatLng(0, 90), center);
   }
@@ -409,10 +409,10 @@ public class LatLngBoundsTest {
 
   @Test
   public void intersectWestWrapCheck() {
-    LatLngBounds latLngBounds1 = LatLngBounds.from(0, 0, -10, 150);
+    LatLngBounds latLngBounds1 = LatLngBounds.from(0, 0, -10, -210);
     LatLngBounds latLngBounds2 = LatLngBounds.from(0, 0, -90, -200);
 
-    LatLngBounds intersectLatLngBounds = LatLngBounds.from(0, 0, -10, 160);
+    LatLngBounds intersectLatLngBounds = LatLngBounds.from(0, 0, -10, -200);
 
     assertEquals(latLngBounds1.intersect(latLngBounds2), intersectLatLngBounds);
     assertEquals(latLngBounds2.intersect(latLngBounds1), intersectLatLngBounds);
@@ -697,9 +697,9 @@ public class LatLngBoundsTest {
   @Test
   public void fromTileID() {
     LatLngBounds bounds = LatLngBounds.from(0, 0, 0);
-    assertEquals(GeometryConstants.MIN_LONGITUDE, bounds.getLonWest(), DELTA);
+    assertEquals(GeometryConstants.MIN_WRAP_LONGITUDE, bounds.getLonWest(), DELTA);
     assertEquals(GeometryConstants.MIN_MERCATOR_LATITUDE, bounds.getLatSouth(), DELTA);
-    assertEquals(GeometryConstants.MAX_LONGITUDE, bounds.getLonEast(), DELTA);
+    assertEquals(GeometryConstants.MAX_WRAP_LONGITUDE, bounds.getLonEast(), DELTA);
     assertEquals(GeometryConstants.MAX_MERCATOR_LATITUDE, bounds.getLatNorth(), DELTA);
 
     bounds = LatLngBounds.from(10, 288, 385);
@@ -742,10 +742,10 @@ public class LatLngBoundsTest {
   }
 
   @Test
-  public void testConstructorChecksEastLongitudeInfinity() {
-    exception.expect(IllegalArgumentException.class);
-    exception.expectMessage("longitude must not be infinite");
-    LatLngBounds.from(0, Double.POSITIVE_INFINITY, -20, -20);
+  public void testConstructorEastLongitudeInfinityAllowed() {
+    LatLngBounds latLngBounds =
+            LatLngBounds.from(0, Double.POSITIVE_INFINITY, -20, -20);
+    assertEquals(Double.POSITIVE_INFINITY, latLngBounds.getLonEast(), DELTA);
   }
 
   @Test
@@ -777,10 +777,10 @@ public class LatLngBoundsTest {
   }
 
   @Test
-  public void testConstructorChecksWestLongitudeInfinity() {
-    exception.expect(IllegalArgumentException.class);
-    exception.expectMessage("longitude must not be infinite");
-    LatLngBounds.from(20, 20, 0, Double.POSITIVE_INFINITY);
+  public void testConstructorWestLongitudeInfinityAllowed() {
+    LatLngBounds latLngBounds =
+            LatLngBounds.from(20, 20, 0, Double.NEGATIVE_INFINITY);
+    assertEquals(Double.NEGATIVE_INFINITY, latLngBounds.getLonWest(), DELTA);
   }
 
   @Test
@@ -788,5 +788,12 @@ public class LatLngBoundsTest {
     exception.expect(IllegalArgumentException.class);
     exception.expectMessage("latNorth cannot be less than latSouth");
     LatLngBounds.from(0, 20, 20, 0);
+  }
+
+  @Test
+  public void testConstructorCheckLonWestGreaterLonEast() {
+    exception.expect(IllegalArgumentException.class);
+    exception.expectMessage("lonEast cannot be less than lonWest");
+    LatLngBounds.from(20, 0, 0, 20);
   }
 }

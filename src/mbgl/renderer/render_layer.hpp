@@ -23,13 +23,9 @@ class TransformState;
 
 class RenderLayer {
 protected:
-    RenderLayer(style::LayerType, Immutable<style::Layer::Impl>);
-
-    const style::LayerType type;
+    RenderLayer(Immutable<style::Layer::Impl>);
 
 public:
-    static std::unique_ptr<RenderLayer> create(Immutable<style::Layer::Impl>);
-
     virtual ~RenderLayer() = default;
 
     // Begin transitions for any properties that have changed since the last frame.

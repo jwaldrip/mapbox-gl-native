@@ -133,21 +133,20 @@ ViewportMode TransformState::getViewportMode() const {
 #pragma mark - Camera options
 
 CameraOptions TransformState::getCameraOptions(const EdgeInsets& padding) const {
-    CameraOptions camera;
-
-    if (padding.isFlush()) {
-        camera.center = getLatLng();
-    } else {
+    const LatLng center = [&]() {
+        if (padding.isFlush()) {
+            return getLatLng();
+        }
         ScreenCoordinate point = padding.getCenter(size.width, size.height);
         point.y = size.height - point.y;
-        camera.center = screenCoordinateToLatLng(point).wrapped();
-    }
-    camera.padding = padding;
-    camera.zoom = getZoom();
-    camera.angle = -angle * util::RAD2DEG;
-    camera.pitch = pitch * util::RAD2DEG;
-
-    return camera;
+        return screenCoordinateToLatLng(point).wrapped();
+    }();
+    return CameraOptions()
+        .withCenter(center)
+        .withPadding(padding)
+        .withZoom(getZoom())
+        .withAngle(-angle * util::RAD2DEG)
+        .withPitch(pitch * util::RAD2DEG);
 }
 
 #pragma mark - Position

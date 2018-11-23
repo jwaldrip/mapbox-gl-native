@@ -12,6 +12,13 @@ namespace mbgl {
 /** Various options for describing the viewpoint of a map. All fields are
     optional. */
 struct CameraOptions {
+    CameraOptions& withCenter(const optional<LatLng>& o) { center = o; return *this; }
+    CameraOptions& withPadding(const EdgeInsets& p) { padding = p; return *this; }
+    CameraOptions& withAnchor(const optional<ScreenCoordinate>& o) { anchor = o; return *this; }
+    CameraOptions& withZoom(const optional<double>& o) { zoom = o; return *this; }
+    CameraOptions& withAngle(const optional<double>& o) { angle = o; return *this; }
+    CameraOptions& withPitch(const optional<double> o) { pitch = o; return *this; }
+
     /** Coordinate at the center of the map. */
     optional<LatLng> center;
 

@@ -476,6 +476,23 @@ TEST(Transform, Camera) {
     transform.updateTransitions(transform.getTransitionStart() + Milliseconds(750));
     transform.updateTransitions(transform.getTransitionStart() + transform.getTransitionDuration());
     ASSERT_FALSE(transform.inTransition());
+
+    // Anchor and center points are mutually exclusive.
+    CameraOptions camera;
+    camera.center = LatLng { 0, 0 };
+    camera.anchor = ScreenCoordinate { 0, 0 }; // top-left
+    camera.zoom = transform.getState().getMaxZoom();
+#ifndef NDEBUG
+    ASSERT_DEATH(transform.jumpTo(camera), R"test(!camera.anchor \|\| !camera.center)test");
+#else
+    transform.easeTo(camera, AnimationOptions(Seconds(1)));
+    transform.updateTransitions(transform.getTransitionStart() + Milliseconds(250));
+    transform.updateTransitions(transform.getTransitionStart() + Milliseconds(500));
+    transform.updateTransitions(transform.getTransitionStart() + Milliseconds(750));
+    transform.updateTransitions(transform.getTransitionStart() + transform.getTransitionDuration());
+    ASSERT_DOUBLE_EQ(transform.getLatLng().latitude(), 0);
+    ASSERT_DOUBLE_EQ(transform.getLatLng().longitude(), 0);
+#endif // NDEBUG
 }
 
 TEST(Transform, DefaultTransform) {

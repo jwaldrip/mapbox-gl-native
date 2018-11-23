@@ -1572,14 +1572,14 @@ public:
         {
             self.mbglMap.setZoom(newZoom, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y });
             // The gesture recognizer only reports the gesture’s current center
-            // point, so use the previous center point to anchor the transition.
+            // point, so use the previous center point to centerPoint the transition.
             // If the number of touches has changed, the remembered center point is
             // meaningless.
             if (self.userTrackingMode == MGLUserTrackingModeNone && pinch.numberOfTouches == _previousPinchNumberOfTouches)
             {
                 CLLocationCoordinate2D centerCoordinate = _previousPinchCenterCoordinate;
                 self.mbglMap.setLatLng(MGLLatLngFromLocationCoordinate2D(centerCoordinate),
-                                    mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y });
+                                    mbgl::EdgeInsets { centerPoint.y, centerPoint.x, self.size.height - centerPoint.y, self.size.width - centerPoint.x });
             }
         }
         [self cameraIsChanging];
